@@ -8,6 +8,7 @@ interface AuthContextType {
     login: (token: string) => void
     logout: () => void
     isAuthenticated: boolean
+    getToken: () => string | undefined
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -65,8 +66,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         router.push('/')
     }
 
+    const getToken = (): string | undefined => {
+        return Cookies.get('auth_token')
+    }
+
     return (
-        <AuthContext.Provider value={{ login, logout, isAuthenticated }}>
+        <AuthContext.Provider value={{ login, logout, isAuthenticated, getToken }}>
             {children}
         </AuthContext.Provider>
     )

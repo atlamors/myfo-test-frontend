@@ -7,11 +7,15 @@ if (!BACKEND_URL) {
     throw new Error('BACKEND_URL is not defined')
 }
 
+type Params = { params: { id: string } };
+
 export async function GET(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    context: any
 ) {
     try {
+        const { params } = context as Params;
         const { id: accountId } = await params;
         console.log('GET [/api/v1/accounts] req for account:', accountId)
         

@@ -4,6 +4,14 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { useAuth } from '@/contexts/AuthContext';
 import { useEffect, useState } from 'react';
 
+interface Account {
+    accountName?: string;
+    accountId?: string;
+    balance?: number;
+    currency?: string;
+    accountType?: string;
+}
+
 async function fetchAccountData(accountId: string, token: string) {
     const baseUrl = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000';
     const res = await fetch(`${baseUrl}/api/v1/accounts/${accountId}`, {
@@ -24,7 +32,7 @@ async function fetchAccountData(accountId: string, token: string) {
 
 export default function AccountDetails({ accountId }: { accountId: string }) {
     const { getToken } = useAuth();
-    const [account, setAccount] = useState<any>({});
+    const [account, setAccount] = useState<Account>({});
 
     useEffect(() => {
         const token = getToken();

@@ -56,6 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         Cookies.set('session', 'active', { expires: 7 }) // 7 day session
         Cookies.set('auth_token', token)
         setIsAuthenticated(true)
+        router.refresh();
         router.push('/accounts')
     }
 

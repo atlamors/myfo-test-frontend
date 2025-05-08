@@ -7,12 +7,18 @@ if (!BACKEND_URL) {
     throw new Error('BACKEND_URL is not defined')
 }
 
-export async function GET(request: NextRequest) {
+export async function GET(
+    request: NextRequest,
+    { params }: { params: { id: string } }
+) {
     try {
-        console.log('[GET] /api/v1/accounts request received')
+        const { id: accountId } = await params;
+        console.log('GET [/api/v1/accounts] req for account:', accountId)
         
-        // Get the auth token from cookies
-        const token = request.cookies.get('auth_token')?.value
+        // Get the auth token from headers
+        const authHeader = request.headers.get('Authorization');
+        const token = authHeader ? authHeader.replace('Bearer ', '') : null;
+        console.log('[/api/v1/accounts] token', token);
 
         if (!token) {
             return NextResponse.json(
@@ -21,8 +27,12 @@ export async function GET(request: NextRequest) {
             )
         }
 
-        // Get the account ID from the URL
-        const accountId = request.nextUrl.pathname.split('/').pop()
+        if (!accountId) {
+            return NextResponse.json(
+                { message: 'Account ID is required' },
+                { status: 400 }
+            )
+        }
 
         // Make request to backend
         const response = await fetch(`${BACKEND_URL}/api/v1/accounts/${accountId}`, {
@@ -32,15 +42,16 @@ export async function GET(request: NextRequest) {
             },
         })
 
-        const data = await response.json()
-
         if (!response.ok) {
+            console.error(`Backend request failed: ${response.status} ${response.statusText}`)
+            const data = await response.json().catch(() => ({}))
             return NextResponse.json(
                 { message: data.message || 'Failed to fetch account data' },
                 { status: response.status }
             )
         }
 
+        const data = await response.json()
         return NextResponse.json(data)
     } catch (error) {
         console.error('Error fetching account data:', error)
@@ -49,4 +60,4 @@ export async function GET(request: NextRequest) {
             { status: 500 }
         )
     }
-}
+} 
